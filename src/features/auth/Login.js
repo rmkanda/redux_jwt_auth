@@ -1,8 +1,8 @@
 import { useRef, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
-import { useDispatch } from "react-redux";
-import { setCredentials } from "./authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setCredentials, selectCurrentToken } from "./authSlice";
 import { useLoginMutation } from "./authApiSlice";
 
 const Login = () => {
@@ -17,7 +17,7 @@ const Login = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    userRef.current.focus();
+    userRef.current?.focus();
   }, []);
 
   useEffect(() => {
@@ -28,7 +28,6 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      console.log(user, pwd);
       const userData = await login({ user, pwd }).unwrap();
       dispatch(setCredentials(userData));
       setUser("");
@@ -53,6 +52,8 @@ const Login = () => {
 
   const handlePwdInput = (e) => setPwd(e.target.value);
 
+  const token = useSelector(selectCurrentToken);
+  if (token) return <Navigate to={"/welcome"} />;
   const content = isLoading ? (
     <h1>Loading...</h1>
   ) : (
